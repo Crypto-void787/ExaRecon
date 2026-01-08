@@ -1,68 +1,64 @@
-import socket
-from concurrent.futures import ThreadPoolExecutor
-
-def grab_banner(ip, port, service):
-    try:
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.settimeout(1)
-
-        if s.connect_ex((ip, port)) != 0:
-            return None
-
-        try:
-            banner = s.recv(1024).decode(errors="ignore").strip()
-        except:
-            banner = "Unknown"
-
-        s.close()
-        return f"{port}/tcp\topen\t{service}\t{banner}"
-
-    except:
-        return None
-
+import argparse
+from scanner import scan_target
+from utils import parse_ports
 
 def main():
-    target_ip = "IP_here"  # Replace with the target IP address
+    parser = argparse.ArgumentParser(
+        description="ExaRecon - Lightweight Network Reconnaissance Tool"
+    )
 
-    ports = {
-        21: "ftp",
-        22: "ssh",
-        23: "telnet",
-        25: "smtp",
-        53: "dns",
-        80: "http",
-        81: "http-alt",
-        110: "pop3",
-        139: "netbios",
-        143: "imap",
-        389: "ldap",
-        445: "smb",
-        636: "ldaps",
-        2049: "nfs",
-        3306: "mysql",
-        3389: "rdp",
-        5432: "postgres",
-        5900: "vnc",
-        6379: "redis",
-        8080: "http-alt",
-        8443: "https-alt",
-        9200: "elasticsearch",
-        27017: "mongodb"
-    }
+    parser.add_argument(
+        "-t", "--target",
+        required=True,
+        help="Target IP address or hostname"
+    )
 
-    print(f"\nExaRecon scan report for {target_ip}")
-    print("PORT\tSTATE\tSERVICE\tVERSION")
+    parser.add_argument(
+        "-p", "--ports",
+        default="1-1024",
+        help="Port range (e.g. 1-1000 or 80,443,22)"
+    )
 
-    with ThreadPoolExecutor(max_workers=50) as executor:
-        tasks = [
-            executor.submit(grab_banner, target_ip, port,    service)
-            for port, service in ports.items()
-        ]
+    parser.add_argument(
+        "-T", "--threads",
+        type=int,
+        default=50,
+        help="Number of concurrent threads (default: 50)"
+    )
 
-        for task in tasks:
-            result = task.result()
-            if result:
-                print(result)
+    parser.add_argument(
+        "--timeout",
+        type=float,
+        default=1.0,
+        help="Socket timeout in seconds (default: 1.0)"
+    )
+
+    args = parser.parse_args()
+
+    try:
+        ports = parse_ports(args.ports)
+    except ValueError as e:
+        print(f"[!] Error: {e}")
+        return
+
+    print(f"\n[+] ExaRecon Scan Started")
+    print(f"[+] Target   : {args.target}")
+    print(f"[+] Ports    : {len(ports)} ports")
+    print(f"[+] Threads  : {args.threads}")
+    print(f"[+] Timeout  : {args.timeout}s\n")
+
+    print("PORT\tSTATE\tSERVICE\tBANNER")
+
+    try:
+        scan_target(
+            target=args.target,
+            ports=ports,
+            threads=args.threads,
+            timeout=args.timeout
+        )
+    except KeyboardInterrupt:
+        print("\n[!] Scan aborted by user.")
+
 
 
 if __name__ == "__main__":
