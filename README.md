@@ -1,37 +1,57 @@
-# ExaRecon 🔍
+# ExaRecon 🔍 (v2)
 
-**ExaRecon** is a lightweight Python-based reconnaissance tool built to enumerate exposed ports and fingerprint running services using banner grabbing techniques.
+ExaRecon is a lightweight, modular Python-based network reconnaissance tool designed to enumerate open TCP ports and fingerprint running services using banner grabbing techniques.
 
----
-
-## 🚀 Features
-
-- Scans common and high‑risk ports
-- Performs service banner grabbing
-- Identifies exposed services (SSH, FTP, HTTP, SMB, DBs, etc.)
-- Graceful error handling and timeouts
-- Readable, well-documented Python code
+Built for learning, lab environments, and ethical security research.
 
 ---
 
-## 🧠 Why ExaRecon?
+## 🚀 What’s New in v2
 
-During the reconnaissance phase, attackers enumerate open ports and fingerprint services to:
-
-- Identify potential attack vectors  
-- Discover weak or legacy services  
-- Understand the target’s attack surface  
-
-**ExaRecon replicates this workflow** in a controlled, ethical learning environment.
+- Modular architecture
+- CLI-based execution with argparse
+- Multi-threaded scanning for speed
+- Custom port ranges (single, range, comma-separated)
+- Configurable timeout handling
+- Cleaner, structured output
+- Improved error handling
 
 ---
 
-## ⚙️ How It Works (High Level)
+## 🧠 Why ExaRecon Exists
 
-1. Establishes TCP connections using Python sockets  
-2. Iterates through a list of common and “juicy” ports  
-3. Extracts service banners where available  
-4. Displays results for further enumeration  
+During the **reconnaissance phase**, attackers and penetration testers:
+
+- Enumerate open ports  
+- Identify exposed services  
+- Fingerprint software versions  
+- Map the attack surface  
+
+ExaRecon mirrors this workflow in a **controlled, ethical learning environment**, helping you understand *how attackers think* before exploitation even begins.
+
+---
+
+## ⚙️ How It Works (High-Level)
+
+1. Parses user-supplied port ranges
+2. Establishes TCP connections using Python sockets
+3. Uses multi-threading for faster scans
+4. Performs banner grabbing where possible
+5. Maps ports to common services
+6. Displays results for further enumeration
+
+---
+
+## 🧪 Supported Service Detection
+
+- SSH
+- FTP
+- HTTP / HTTPS
+- SMB
+- RDP
+- Databases (MySQL, PostgreSQL, Redis)
+- Mail services (SMTP, POP3, IMAP)
+- And more
 
 ---
 
@@ -42,5 +62,4 @@ During the reconnaissance phase, attackers enumerate open ports and fingerprint 
 ## ▶️ Usage
 
 ```bash
- python ExaRecon.py
- ```
+python ExaRecon.py -t <target> -p <ports> -T <threads> --timeout <seconds>
